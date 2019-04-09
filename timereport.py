@@ -1,7 +1,16 @@
 import re
 import sys
 
-line_re = re.compile(r'^((?:\d{4}-\d{2}-\d{2})) (\d{1,2}):(\d{1,2})-(\d{1,2}):(\d{1,2})(?: \((\d+) min.*\))?')
+line_re = re.compile(r'^((?:\d{4}-\d{2}-\d{2})) (\d{1,2}:\d{1,2})-(\d{1,2}:\d{1,2})(?: \((\d+) min.*\))?')
+
+def to_minutes(s):
+    """
+    Convert a time specification on the form hh:mm to minutes.
+    >>> to_minutes('8:05')
+    485
+    """
+    h, m = s.split(':')
+    return int(h) * 60 + int(m)
 
 def main():
     total_duration = 0
@@ -12,8 +21,8 @@ def main():
             m = line_re.search(line)
             if m:
                 try:
-                    d, hs, ms, he, me, p = m.groups()
-                    duration = int(he) * 60 + int(me) - (int(hs) * 60 + int(ms))
+                    date, start, stop, p = m.groups()
+                    duration = to_minutes(stop) - to_minutes(start)
                     pause = int(p) if p else 0
                     total_duration += duration - pause
                     print("{} ({}-{}={} min)".format(line, duration, pause, duration - pause))
