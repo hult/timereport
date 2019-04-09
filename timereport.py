@@ -51,14 +51,22 @@ def minutes_from_file(f):
     2019-04-09 8:00-17:00 (50 min lunch) jobbade med data (490 min)
     2019-04-09 9:15-16:30 (75 min lunch) mer data (360 min)
     850
+    >>> minutes_from_file(["\\n"])
+    0
+    >>> minutes_from_file(["ill-formatted line\\n"])
+    * ill-formatted line
+    0
     """
     total_duration = 0
     for line in f:
         line = line[:-1]
         if line:
             minutes = minutes_from_line(line)
-            total_duration += minutes
-            print(f"{line} ({minutes} min)")
+            if minutes:
+                total_duration += minutes
+                print(f"{line} ({minutes} min)")
+            else:
+                print(f"* {line}")
     return total_duration
 
 def format_duration(duration):
