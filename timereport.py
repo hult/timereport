@@ -72,9 +72,16 @@ def format_duration(duration):
     m = duration % 60
     return f"{h}:{m:02}"
 
+def timereport(f):
+    """Given a file, return its time report.
+    >>> timereport(['2019-04-09 8:00-17:00 (50 min lunch) jobbade med data', '2019-04-09 9:15-16:30 (75 min lunch) mer data'])
+    'Total 850 min, 14:10'
+    """
+    duration = minutes_from_file(f)
+    return f"Total {duration} min, {format_duration(duration)}"
+
 def main():
-    duration = minutes_from_file(sys.stdin)
-    print(f"Total {duration} min, {format_duration(duration)}")
+    print(timereport(sys.stdin))
 
 if __name__ == '__main__':
     main()
