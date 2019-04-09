@@ -28,19 +28,36 @@ def minutes_from_line(line):
         return duration - pause
     return None
 
-def main():
+def minutes_from_file(f):
+    """Given a file, return number of minutes worked.
+    >>> minutes_from_file(['2019-04-09 8:00-17:00 (50 min lunch) jobbade med data', '2019-04-09 9:15-16:30 (75 min lunch) mer data'])
+    850
+    """
     total_duration = 0
-
-    for line in sys.stdin:
+    for line in f:
         line = line[:-1]
         if line:
             minutes = minutes_from_line(line)
             total_duration += minutes
-            print(f"{line} ({minutes} min)")
+            print(f"{line} ({minutes} min)", file=sys.stderr)
+    return total_duration
 
-    total_h = total_duration // 60
-    total_m = total_duration % 60
-    print(f"Total {total_duration} min, {total_h:02}:{total_m:02}")
+def format_duration(duration):
+    """Given a duration in minutes, return a string on the format h:mm.
+    >>> format_duration(75)
+    '1:15'
+    >>> format_duration(4)
+    '0:04'
+    >>> format_duration(601)
+    '10:01'
+    """
+    h = duration // 60
+    m = duration % 60
+    return f"{h}:{m:02}"
+
+def main():
+    duration = minutes_from_file(sys.stdin)
+    print(f"Total {duration} min, {format_duration(duration)}")
 
 if __name__ == '__main__':
     main()
