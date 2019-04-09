@@ -1,3 +1,18 @@
+"""timereport.py
+
+This script parses standard input on the format
+
+    yyyy-mm-dd h1:mm1-h2:mm2 (x min...) ...
+    ...
+
+And prints out the total duration of the timespans h2:mm2 - h1:mm1 - x.
+It's useful for generating time reports.
+
+To run tests:
+
+    python -m doctest timereport.py
+"""
+
 import re
 import sys
 
@@ -18,6 +33,8 @@ def minutes_from_line(line):
     >>> minutes_from_line('2019-04-09 8:00-17:00 jobbade med data')
     540
     >>> minutes_from_line('2019/04/09 8.00-17.00 jobbade med data') is None
+    True
+    >>> minutes_from_line('') is None
     True
     """
     m = line_re.search(line)
