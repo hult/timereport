@@ -47,7 +47,9 @@ def minutes_from_line(line):
 
 def minutes_from_file(f):
     """Given a file, return number of minutes worked.
-    >>> minutes_from_file(['2019-04-09 8:00-17:00 (50 min lunch) jobbade med data', '2019-04-09 9:15-16:30 (75 min lunch) mer data'])
+    >>> minutes_from_file(["2019-04-09 8:00-17:00 (50 min lunch) jobbade med data\\n", "2019-04-09 9:15-16:30 (75 min lunch) mer data\\n"])
+    2019-04-09 8:00-17:00 (50 min lunch) jobbade med data (490 min)
+    2019-04-09 9:15-16:30 (75 min lunch) mer data (360 min)
     850
     """
     total_duration = 0
@@ -56,7 +58,7 @@ def minutes_from_file(f):
         if line:
             minutes = minutes_from_line(line)
             total_duration += minutes
-            print(f"{line} ({minutes} min)", file=sys.stderr)
+            print(f"{line} ({minutes} min)")
     return total_duration
 
 def format_duration(duration):
@@ -74,8 +76,9 @@ def format_duration(duration):
 
 def timereport(f):
     """Given a file, return its time report.
-    >>> timereport(['2019-04-09 8:00-17:00 (50 min lunch) jobbade med data', '2019-04-09 9:15-16:30 (75 min lunch) mer data'])
-    'Total 850 min, 14:10'
+    >>> timereport(["2019-04-09 8:00-17:00 (50 min lunch) jobbade med data\\n"])
+    2019-04-09 8:00-17:00 (50 min lunch) jobbade med data (490 min)
+    'Total 490 min, 8:10'
     """
     duration = minutes_from_file(f)
     return f"Total {duration} min, {format_duration(duration)}"
