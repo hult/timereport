@@ -30,6 +30,10 @@ def minutes_from_line(line):
     """Given a line, extract the number of minutes worked, or None if failing to parse.
     >>> minutes_from_line('2019-04-09 8:00-17:00 (50 min lunch) jobbade med data')
     490
+    >>> minutes_from_line('2019-04-09 8:00-17:00 (50 min lunch + 10 min call) jobbade med data')
+    480
+    >>> minutes_from_line('2019-08-16 7:10-8:10, 9:00-9:10, 9:30-10:00, 11:25-11:45, 13:35-13:45')
+    130
     >>> minutes_from_line('2019-04-09 8:00-17:00 jobbade med data')
     540
     >>> minutes_from_line('2019/04/09 8.00-17.00 jobbade med data') is None
