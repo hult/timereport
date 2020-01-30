@@ -52,29 +52,31 @@ def minutes_from_line(line):
         return duration - pause
     return None
 
-def minutes_from_file(f):
-    """Given a file, return number of minutes worked.
-    >>> minutes_from_file(["2019-04-09 8:00-17:00 (50 min lunch) jobbade med data\\n", "2019-04-09 9:15-16:30 (75 min lunch) mer data\\n"])
+def stats_from_file(f):
+    """Given a file, return a tuple of number of days (lines) worked, and number of minutes worked.
+    >>> stats_from_file(["2019-04-09 8:00-17:00 (50 min lunch) jobbade med data\\n", "2019-04-09 9:15-16:30 (75 min lunch) mer data\\n"])
     2019-04-09 8:00-17:00 (50 min lunch) jobbade med data (490 min)
     2019-04-09 9:15-16:30 (75 min lunch) mer data (360 min)
-    850
-    >>> minutes_from_file(["\\n"])
-    0
-    >>> minutes_from_file(["ill-formatted line\\n"])
+    (2, 850)
+    >>> stats_from_file(["\\n"])
+    (0, 0)
+    >>> stats_from_file(["ill-formatted line\\n"])
     * ill-formatted line
-    0
+    (0, 0)
     """
+    total_days = 0
     total_duration = 0
     for line in f:
         line = line[:-1]
         if line:
             minutes = minutes_from_line(line)
             if minutes:
+                total_days += 1
                 total_duration += minutes
                 print(f"{line} ({minutes} min)")
             else:
                 print(f"* {line}")
-    return total_duration
+    return (total_days, total_duration)
 
 def format_duration(duration):
     """Given a duration in minutes, return a string on the format h:mm.
@@ -91,12 +93,14 @@ def format_duration(duration):
 
 def timereport(f):
     """Given a file, return its time report.
-    >>> timereport(["2019-04-09 8:00-17:00 (50 min lunch) jobbade med data\\n"])
+    >>> timereport(["2019-04-09 8:00-17:00 (50 min lunch) jobbade med data\\n", "2019-04-10 11:00-14:00 (40 min lunch) jobbade med data\\n"])
     2019-04-09 8:00-17:00 (50 min lunch) jobbade med data (490 min)
-    'Total 490 min, 8:10'
+    2019-04-10 11:00-14:00 (40 min lunch) jobbade med data (140 min)
+    'Total 2 days, 630 min, 315 mins/day, 10:30'
     """
-    duration = minutes_from_file(f)
-    return f"Total {duration} min, {format_duration(duration)}"
+    days, duration = stats_from_file(f)
+    duration_per_day = duration // days
+    return f"Total {days} days, {duration} min, {duration_per_day} mins/day, {format_duration(duration)}"
 
 def main():
     print(timereport(sys.stdin))
