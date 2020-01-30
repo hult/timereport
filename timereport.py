@@ -25,15 +25,15 @@ def to_minutes(s):
     h, m = s.split(':')
     return int(h) * 60 + int(m)
 
-line_re = re.compile(r'^((?:\d{4}-\d{2}-\d{2})) (\d{1,2}:\d{1,2})-(\d{1,2}:\d{1,2})(?: \((\d+) min.*\))?')
+line_re = re.compile(r'^((?:\d{4}-\d{2}-\d{2})) ((?:\d{1,2}:\d{1,2}-\d{1,2}:\d{1,2}(?:, *)?)+)(?: \((\d+) min.*\))?')
 def minutes_from_line(line):
     """Given a line, extract the number of minutes worked, or None if failing to parse.
     >>> minutes_from_line('2019-04-09 8:00-17:00 (50 min lunch) jobbade med data')
     490
     >>> minutes_from_line('2019-04-09 8:00-17:00 (50 min lunch + 10 min call) jobbade med data')
     480
-    >>> minutes_from_line('2019-08-16 7:10-8:10, 9:00-9:10, 9:30-10:00, 11:25-11:45, 13:35-13:45')
-    130
+    >>> minutes_from_line('2019-08-16 7:10-8:10, 9:00-9:10, 9:30-10:00, 11:25-11:45, 13:35-13:45 (15 min lunch) jobbade')
+    115
     >>> minutes_from_line('2019-04-09 8:00-17:00 jobbade med data')
     540
     >>> minutes_from_line('2019/04/09 8.00-17.00 jobbade med data') is None
@@ -43,8 +43,11 @@ def minutes_from_line(line):
     """
     m = line_re.search(line)
     if m:
-        date, start, stop, p = m.groups()
-        duration = to_minutes(stop) - to_minutes(start)
+        date, intervals, p = m.groups()
+        duration = 0
+        for interval in re.split(r', *', intervals):
+            start, stop = interval.split('-')
+            duration += to_minutes(stop) - to_minutes(start)
         pause = int(p) if p else 0
         return duration - pause
     return None
