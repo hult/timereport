@@ -8,11 +8,17 @@ This script parses standard input on the format
 And prints out the total duration of the timespans h2:mm2 - h1:mm1 - x.
 It's useful for generating time reports.
 
+You can also provide a string as the first command-line argument to read
+from instead of standard input
+
+    python timereport.py "2021-09-14 8:00-17:00 (60 min lunch) did stuff"
+
 To run tests:
 
     python -m doctest timereport.py
 """
 
+import io
 import re
 import sys
 
@@ -63,11 +69,14 @@ def stats_from_file(f):
     >>> stats_from_file(["ill-formatted line\\n"])
     * ill-formatted line
     (0, 0)
+    >>> stats_from_file(["2021-09-14 8:00-11:00 a string does not end in a newline"])
+    2021-09-14 8:00-11:00 a string does not end in a newline (180 min)
+    (1, 180)
     """
     total_days = 0
     total_duration = 0
     for line in f:
-        line = line[:-1]
+        line = line.rstrip('\n')
         if line:
             minutes = minutes_from_line(line)
             if minutes:
@@ -103,7 +112,10 @@ def timereport(f):
     return f"Total {days} days, {duration} min, {duration_per_day} mins/day, {format_duration(duration)}"
 
 def main():
-    print(timereport(sys.stdin))
+    if len(sys.argv) == 2:
+        print(timereport(io.StringIO(sys.argv[1])))
+    else:
+        print(timereport(sys.stdin))
 
 if __name__ == '__main__':
     main()
